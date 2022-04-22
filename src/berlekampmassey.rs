@@ -55,9 +55,9 @@ fn berlekamp_massey(series: &[Felt]) -> Vec::<Felt> {
                 c.resize(max(d.len(), c.len()), Felt::ZERO);
                 
                 c = c.iter().zip(d.iter()).map(| (&c, &d) | c + d).collect();
-                
+               
+                // Update old_c if there is a better left endpoint
                 if i - temp.len() > index - old_c.len() {
-                    // There is a better left endpoint
                     old_c = temp;
                     best_c_index_failure = Some(i);
                 }
@@ -72,18 +72,22 @@ fn test_berlekamp_massey(){
     // Test cases from https://mzhang2021.github.io/cp-blog/berlekamp-massey/
 
     // 1,2,3,8,16
+    // 2 (s-1)
     let series: Vec<Felt> = [1_u64, 2, 4, 8, 16].iter().map(|&num| Felt::new(num)).collect();
     assert_eq!(vec![Felt::new(2)], berlekamp_massey(&series));
 
     // 0,1,1,3,5,11,21
+    // 1 (s-1) + 2 (s-2)
     let series: Vec<Felt> = [0_u64, 1, 1, 3, 5, 11, 21].iter().map(|&num| Felt::new(num)).collect();
     assert_eq!(vec![Felt::new(1), Felt::new(2)], berlekamp_massey(&series));
 
     // 1,8,10,26,46
+    //  1 (s-1) + 2 (s-2) 
     let series: Vec<Felt> = [1_u64, 8, 10, 26, 46].iter().map(|&num| Felt::new(num)).collect();
     assert_eq!(vec![Felt::new(1), Felt::new(2)], berlekamp_massey(&series));
     
     // 1,3,5,11,25,59,141,339
+    // 3 (s-1) - 1 (s-2) - 1 (s-3)
     let series: Vec<Felt> = [1_u64, 3, 5, 11, 25, 59, 141, 339].iter().map(|&num| Felt::new(num)).collect();
     assert_eq!(vec![Felt::new(3), Felt::ZERO - Felt::ONE, Felt::ZERO - Felt::ONE], berlekamp_massey(&series));
 }
