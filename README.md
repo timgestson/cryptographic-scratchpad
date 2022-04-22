@@ -1,4 +1,4 @@
-# Cryptographic-Scratchpad
+# Cryptography Scratchpad
 
 Algorithms:
 

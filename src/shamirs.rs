@@ -1,6 +1,6 @@
 use rand::prelude::*;
 use std::vec::Vec;
-use math::{fields::f64::BaseElement as Felt};
+use math::{fields::f64::BaseElement as Felt, FieldElement};
 
 /* Shamir's Secret Sharing Algorithm adapted from https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
 // Using Winterfell's FieldElements so I dont have to reimplement Finite Fields
@@ -18,13 +18,19 @@ fn split_secret(secret: Felt) -> Vec<(Felt, Felt)> {
     let (a, b) = generate_two_randoms();
     let mut pairs = Vec::<(Felt, Felt)>::new();
     for x in 1..6 {
-        pairs.push(calculate_polynomial_pairs(secret, a, b, Felt::new(x)));
+        let x = Felt::new(x);
+        pairs.push((x, evaluate_polynomial_at(&[secret, a, b], x)));
     }
     pairs
 }
 
-fn calculate_polynomial_pairs(a0: Felt, a1: Felt, a2: Felt, x: Felt) -> (Felt, Felt){
-    (x, a0 + a1 * x + a2 * x * x)
+fn evaluate_polynomial_at(polynomial: &[Felt], x: Felt) -> Felt {
+    polynomial.iter().enumerate().map(|(degree, &(mut coef))| {
+        for _ in 0..degree {
+            coef *= x;
+        }
+        coef
+    }).fold(Felt::ZERO, |a, b| a + b)
 }
 
 fn generate_two_randoms() -> (Felt, Felt) {
@@ -52,7 +58,7 @@ fn lagrange_interpolation(x: Felt, points: Vec<(Felt, Felt)>) -> Felt {
 
 #[test]
 fn test_shamirs_secret(){
-    let secret = Felt::new(10);
+    let secret = Felt::new(54354325);
     let vector = split_secret(secret);
     // Assert 3 points gives the correct y intercept
     assert_eq!(secret, lagrange_interpolation(Felt::new(0), vector[0..3].to_vec()));
