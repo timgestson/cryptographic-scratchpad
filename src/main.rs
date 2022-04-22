@@ -1,6 +1,6 @@
-fn main() {
-    print!("Cryptography!")
-}
-
-mod shamirs;
 mod berlekampmassey;
+mod shamirs;
+
+fn main() {
+    print!("Cryptography and Math!")
+}

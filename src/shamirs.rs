@@ -1,6 +1,6 @@
+use math::{fields::f64::BaseElement as Felt, FieldElement};
 use rand::prelude::*;
 use std::vec::Vec;
-use math::{fields::f64::BaseElement as Felt, FieldElement};
 
 /* Shamir's Secret Sharing Algorithm adapted from https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
 // Using Winterfell's FieldElements so I dont have to reimplement Finite Fields
@@ -25,12 +25,16 @@ fn split_secret(secret: Felt) -> Vec<(Felt, Felt)> {
 }
 
 fn evaluate_polynomial_at(polynomial: &[Felt], x: Felt) -> Felt {
-    polynomial.iter().enumerate().map(|(degree, &(mut coef))| {
-        for _ in 0..degree {
-            coef *= x;
-        }
-        coef
-    }).fold(Felt::ZERO, |a, b| a + b)
+    polynomial
+        .iter()
+        .enumerate()
+        .map(|(degree, &(mut coef))| {
+            for _ in 0..degree {
+                coef *= x;
+            }
+            coef
+        })
+        .fold(Felt::ZERO, |a, b| a + b)
 }
 
 fn generate_two_randoms() -> (Felt, Felt) {
@@ -57,15 +61,27 @@ fn lagrange_interpolation(x: Felt, points: Vec<(Felt, Felt)>) -> Felt {
 }
 
 #[test]
-fn test_shamirs_secret(){
+fn test_shamirs_secret() {
     let secret = Felt::new(54354325);
     let vector = split_secret(secret);
     // Assert 3 points gives the correct y intercept
-    assert_eq!(secret, lagrange_interpolation(Felt::new(0), vector[0..3].to_vec()));
+    assert_eq!(
+        secret,
+        lagrange_interpolation(Felt::new(0), vector[0..3].to_vec())
+    );
     // Assert a different 3 points gives the correct y intercept
-    assert_eq!(secret, lagrange_interpolation(Felt::new(0), vector[2..5].to_vec()));
-    // Assert 4 points gives the correct y intecept 
-    assert_eq!(secret, lagrange_interpolation(Felt::new(0), vector[0..4].to_vec()));
+    assert_eq!(
+        secret,
+        lagrange_interpolation(Felt::new(0), vector[2..5].to_vec())
+    );
+    // Assert 4 points gives the correct y intecept
+    assert_eq!(
+        secret,
+        lagrange_interpolation(Felt::new(0), vector[0..4].to_vec())
+    );
     // Assert 2 points does not give up the secret
-    assert_ne!(secret, lagrange_interpolation(Felt::new(0), vector[0..2].to_vec()));
+    assert_ne!(
+        secret,
+        lagrange_interpolation(Felt::new(0), vector[0..2].to_vec())
+    );
 }
