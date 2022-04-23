@@ -1,6 +1,5 @@
 use core::cmp::max;
 use math::{fields::f64::BaseElement as Felt, FieldElement};
-use rand::prelude::*;
 use std::vec::Vec;
 
 /* Berlekamp-Massey Algorithm
@@ -30,7 +29,7 @@ fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
         match best_c_index_failure {
             None => {
                 for _ in 0..(i + 1) {
-                    c.push(Felt::new(random::<u64>()));
+                    c.push(Felt::ZERO);
                 }
                 best_c_index_failure = Some(i);
             }
