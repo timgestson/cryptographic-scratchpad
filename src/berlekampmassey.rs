@@ -3,14 +3,17 @@ use math::{fields::f64::BaseElement as Felt, FieldElement};
 use rand::prelude::*;
 use std::vec::Vec;
 
-// Using Berlekamp-Massey Algorithm
-// to find the shortest linear recurrence
-// as stated here https://mzhang2021.github.io/cp-blog/berlekamp-massey/
+/* Berlekamp-Massey Algorithm
+ * https://en.wikipedia.org/wiki/Berlekamp–Massey_algorithm
+ * to find the shortest linear recurrence
+ * as explained here https://mzhang2021.github.io/cp-blog/berlekamp-massey/
+ * also finds the minimal charectaristic polynomial
+ * of a linearly recurrent sequence in a field (See fibanacci test for details)
+ */
 fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
     let mut c = Vec::<Felt>::new();
     let mut old_c = Vec::<Felt>::new();
     let mut best_c_index_failure: Option<usize> = None;
-
     for i in 0..series.len() {
         // calculate descrepency
         let delta = c
@@ -36,7 +39,7 @@ fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
                 let mut d: Vec<Felt> = old_c.iter().map(|&elem| Felt::ZERO - elem).collect();
                 // insert 1 on left
                 d.insert(0, Felt::ONE);
-                
+
                 // series * delta / d(f + 1)
                 let df1 = d
                     .iter()
@@ -67,12 +70,37 @@ fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
     c
 }
 
+fn minimal_charicteristic_polynomial(c: &[Felt]) -> Vec<Felt> {
+    // negate
+    let mut d: Vec<Felt> = c.iter().map(|&elem| Felt::ZERO - elem).collect();
+    // Insert highest level polynomial
+    d.insert(0, Felt::ONE);
+    d
+}
+
 #[test]
 fn test_berlekamp_massey() {
-    // Test cases from https://mzhang2021.github.io/cp-blog/berlekamp-massey/
+    /* Fibinacci
+     * As seen here https://mathcircle.berkeley.edu/sites/default/files/BMC6/ps/linear.pdf
+     * 1 * F(n-1) + 1 * F(n-2) = F(n)  forall n >= 2
+     * F(n+2) = F(n+1) + F(n)  forall n >= 0
+     * 0 = F(n+2) − F(n+1) − F(n)
+     * minimal charecteristic polynomial
+     * 0 = x^2 - x - 1
+     */
+    let series: Vec<Felt> = [0_u64, 1, 1, 2, 3, 5, 8, 13]
+        .iter()
+        .map(|&num| Felt::new(num))
+        .collect();
+    let lr = berlekamp_massey(&series);
+    assert_eq!(vec![Felt::new(1), Felt::new(1)], lr);
+    assert_eq!(
+        minimal_charicteristic_polynomial(&lr),
+        vec![Felt::ONE, Felt::ZERO - Felt::ONE, Felt::ZERO - Felt::ONE]
+    );
 
     // 1,2,3,8,16
-    // 2 (s-1)
+    // 2 F(n-1) = F(n)
     let series: Vec<Felt> = [1_u64, 2, 4, 8, 16]
         .iter()
         .map(|&num| Felt::new(num))
@@ -98,17 +126,6 @@ fn test_berlekamp_massey() {
     // 1,3,5,11,25,59,141,339
     // 3 (s-1) - 1 (s-2) - 1 (s-3)
     let series: Vec<Felt> = [1_u64, 3, 5, 11, 25, 59, 141, 339]
-        .iter()
-        .map(|&num| Felt::new(num))
-        .collect();
-    assert_eq!(
-        vec![Felt::new(3), Felt::ZERO - Felt::ONE, Felt::ZERO - Felt::ONE],
-        berlekamp_massey(&series)
-    );
-    
-    // 2,2,1,2,1,191,393,132
-    // 3 (s-1) - 1 (s-2) - 1 (s-3)
-    let series: Vec<Felt> = [1_u64,2,1,2,1,2]
         .iter()
         .map(|&num| Felt::new(num))
         .collect();
