@@ -70,12 +70,12 @@ fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
     c
 }
 
-fn minimal_charicteristic_polynomial(c: &[Felt]) -> Vec<Felt> {
+fn minimal_characteristic_polynomial(c: &[Felt]) -> Vec<Felt> {
     // negate
-    let mut d: Vec<Felt> = c.iter().map(|&elem| Felt::ZERO - elem).collect();
+    let mut p: Vec<Felt> = c.iter().map(|&elem| Felt::ZERO - elem).collect();
     // Insert highest level polynomial
-    d.insert(0, Felt::ONE);
-    d
+    p.insert(0, Felt::ONE);
+    p
 }
 
 #[test]
@@ -95,7 +95,7 @@ fn test_berlekamp_massey() {
     let lr = berlekamp_massey(&series);
     assert_eq!(vec![Felt::new(1), Felt::new(1)], lr);
     assert_eq!(
-        minimal_charicteristic_polynomial(&lr),
+        minimal_characteristic_polynomial(&lr),
         vec![Felt::ONE, Felt::ZERO - Felt::ONE, Felt::ZERO - Felt::ONE]
     );
 
