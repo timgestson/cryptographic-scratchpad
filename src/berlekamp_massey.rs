@@ -72,7 +72,7 @@ fn berlekamp_massey(series: &[Felt]) -> Vec<Felt> {
 fn minimal_characteristic_polynomial(c: &[Felt]) -> Vec<Felt> {
     // negate
     let mut p: Vec<Felt> = c.iter().map(|&elem| Felt::ZERO - elem).collect();
-    // Insert highest level polynomial
+    // Insert highest degree polynomial
     p.insert(0, Felt::ONE);
     p
 }
