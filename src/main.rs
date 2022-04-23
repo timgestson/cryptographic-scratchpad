@@ -1,4 +1,4 @@
-mod berlekampmassey;
+mod berlekamp_massey;
 mod shamirs;
 
 fn main() {
