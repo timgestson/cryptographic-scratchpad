@@ -108,7 +108,7 @@ fn test_berlekamp_massey() {
     assert_eq!(vec![Felt::new(2)], berlekamp_massey(&series));
 
     // 0,1,1,3,5,11,21
-    // 1 (s-1) + 2 (s-2)
+    // 1 F(n-1) + 2 F(n-2) = F(n)
     let series: Vec<Felt> = [0_u64, 1, 1, 3, 5, 11, 21]
         .iter()
         .map(|&num| Felt::new(num))
@@ -116,7 +116,7 @@ fn test_berlekamp_massey() {
     assert_eq!(vec![Felt::new(1), Felt::new(2)], berlekamp_massey(&series));
 
     // 1,8,10,26,46
-    //  1 (s-1) + 2 (s-2)
+    // 1 F(n-1) + 2 F(n-2) = F(n)
     let series: Vec<Felt> = [1_u64, 8, 10, 26, 46]
         .iter()
         .map(|&num| Felt::new(num))
@@ -124,7 +124,7 @@ fn test_berlekamp_massey() {
     assert_eq!(vec![Felt::new(1), Felt::new(2)], berlekamp_massey(&series));
 
     // 1,3,5,11,25,59,141,339
-    // 3 (s-1) - 1 (s-2) - 1 (s-3)
+    // 3 F(n-1) - 1 F(n-2) - 1 F(n-3)
     let series: Vec<Felt> = [1_u64, 3, 5, 11, 25, 59, 141, 339]
         .iter()
         .map(|&num| Felt::new(num))
