@@ -7,5 +7,9 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
+air = { package = "winter-air", version = "0.3", default-features = false }
 math = { package = "winter-math", version = "0.3", default-features = false }
+prover = { package = "winter-prover", version = "0.3", default-features = false }
+verifier = { package = "winter-verifier", version = "0.3", default-features = false }
+rand-utils = { package = "winter-rand-utils",  version = "0.3", default-features = false  }
 
